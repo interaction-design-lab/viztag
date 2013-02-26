@@ -9,7 +9,7 @@
 // connect to db
 function db_connect($db) {
   try {
-      $dbh = new PDO("mysql:host={$db->host};dbname={$db->name}", $db->user, $db->pass);
+      $dbh = new PDO('mysql:host='.$db['host'].';dbname='.$db['name'], $db['user'], $db['pass']);
   } catch (PDOException $e) {
       echo $e->getMessage();
       die();

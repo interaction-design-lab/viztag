@@ -7,10 +7,10 @@
 error_reporting(E_ALL);
 define('DEBUG', 1);
 
-$config = json_decode(file_get_contents('./config.json'));  # app config
 require_once __DIR__.'/vendor/autoload.php';  # silex
 require_once './util/functions.php';
-$dbh = db_connect($config->db);
+require_once './config.php';  # app config => $config
+$dbh = db_connect($config['db']);
 
 ###################
 # THE APPLICATION #
