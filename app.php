@@ -25,8 +25,8 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 $app['debug'] = true;
 
 $app->get('/', function() use ($app) {
-  $toview = array('help_person' => 'phil');
-  return $app['twig']->render('index.twig', $toview);
+  $data = array('help_person' => 'phil');
+  return $app['twig']->render('index.twig', $data);
 });
 
 # display the log in form
@@ -57,7 +57,8 @@ $app->get('/tag', function() use ($app) {
   if (null == $user = $app['session']->get('user')) {
     return $app->redirect('/viztag/login');
   }
-  return 'todo';
+  $data = array('key' => 'val');
+  return $app['twig']->render('tag.twig', $data);
 });
 
 # persist tagging / commenting for a status
