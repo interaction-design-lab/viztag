@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    {% block head %}
+      <link rel="stylesheet" href="./css/viztag.css" />
+      <title>{% block title %}{% endblock %} - viztag</title>
+    {% endblock %}
+  </head>
+
+  <body>
+
+    <div id="content">{% block content %}{% endblock %}</div>
+
+    <div id="footer">
+      {% block footer %}
+        &copy; 2013 <a href="http://idl.cornell.edu">IDL</a>
+      {% endblock %}
+    </div>
+
+  </body>
+
+</html>
