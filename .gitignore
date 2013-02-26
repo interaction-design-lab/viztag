@@ -1,4 +1,5 @@
 config.json
+composer.lock
 
 vendor/*
 !vendor/README.md
