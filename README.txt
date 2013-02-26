@@ -6,19 +6,24 @@ qualitative coding tool
 install
 -------
 
-viztag requires PHP\>=5.3.2 and depends on the [silex microframework][].
-To install silex, simply run `composer install` from the viztag project
-root; [composer][] will install everything described in
-`./composer.json` under `/vendor`.
-
-You can then upload the entire project, including `/vendor`, to your
-webserver.
+On the server, viztag requires PHP\>=5.3.2 and depends on the [silex
+microframework][].  To install silex, simply run `composer install` from the
+viztag project root; [composer][] will install everything described in
+`./composer.json` under `/vendor`. It's best to set all this up on your
+localhost, and then upload the project, including `/vendor`, to the production
+server.
 
 Files needed to create the database and fill it with sample data are in
 `/fixtures`.
 
+On the front end, viztag uses some fantastic open-source projects:
+[bootstrap][] for layout and CSS, [visualsearch][] for auto-complete
+suggestions, ...
+
 [silex microframework]: http://silex.sensiolabs.org
 [composer]: http://github.com/composer/composer
+[bootstrap]: http://twitter.github.com/bootstrap
+[visualsearch]: http://documentcloud.github.com/visualsearch
 
 use
 ---
@@ -35,8 +40,6 @@ Tags are namespaced, in the form `<namespace>:<tag>`; in the future we may
 allow values as well a la `<namespace>:<predicate>=<value>`, but not now. The
 tagging interface should let coders type in tags, offer autocomplete via [visualsearch][], and
 displays many common tags in a list on a sidebar.
-
-[visualsearch]: http://documentcloud.github.com/visualsearch
 
 future
 ------
