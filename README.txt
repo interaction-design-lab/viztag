@@ -33,7 +33,7 @@ Coder work flow is as follows:
 
 Tags are namespaced, in the form `<namespace>:<tag>`; in the future we may
 allow values as well a la `<namespace>:<predicate>=<value>`, but not now. The
-tagging interface should let coders type in tags, offer autocomplete, and
+tagging interface should let coders type in tags, offer autocomplete via [visualsearch][], and
 displays many common tags in a list on a sidebar.
 
 [visualsearch]: http://documentcloud.github.com/visualsearch
