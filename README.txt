@@ -14,13 +14,16 @@ root; [composer][] will install everything described in
 You can then upload the entire project, including `/vendor`, to your
 webserver.
 
+Files needed to create the database and fill it with sample data are in
+`/fixtures`.
+
 [silex microframework]: http://silex.sensiolabs.org
 [composer]: http://github.com/composer/composer
 
 future
 ------
 
-db (phil)
-silex documentation read (ben)
-front end (ben)
-hook them up (ben)
+- db (phil)
+- silex documentation read (ben)
+- front end (ben)
+- hook them up (ben)
