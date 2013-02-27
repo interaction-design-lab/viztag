@@ -62,8 +62,9 @@ $app->get('/tag', function() use ($app) {
 });
 
 # persist tagging / commenting for a status
-$app->post('/tag/{id}', function($id) use ($app) {
-  return 'POST tag: todo';
+$app->get('/tags', function() use ($app) {
+  $data = array("philadams", "shionguha", "bdalson");
+  return $app->json($data, 200, array('Content-Type' => 'application/json'));
 });
 
 $app->run();

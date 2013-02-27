@@ -1,4 +1,5 @@
 viztag
+======
 
 let multiple coders add tags and comments to the unit of analysis: a
 qualitative coding tool
@@ -17,13 +18,13 @@ Files needed to create the database and fill it with sample data are in
 `/fixtures`.
 
 On the front end, viztag uses some fantastic open-source projects:
-[bootstrap][] for layout and CSS, [typeahead.js][] for auto-complete
-suggestions, ...
+[bootstrap][] for layout and CSS, bootstrap's [typeahead][] project for
+tag autosuggest, ...
 
 [silex microframework]: http://silex.sensiolabs.org
 [composer]: http://github.com/composer/composer
 [bootstrap]: http://twitter.github.com/bootstrap
-[typeahead.js]: https://github.com/twitter/typeahead.js
+[typeahead]: http://twitter.github.com/bootstrap/javascript.html#typeahead
 
 use
 ---
@@ -41,7 +42,7 @@ Coder work flow is as follows:
 Tags are namespaced, in the form `<namespace>:<tag>`; in the future we
 may allow values as well a la `<namespace>:<predicate>=<value>`, but not
 now. The tagging interface should let coders type in tags, offer
-autocomplete via [typeahead.js][], and displays many common tags in a
+autocomplete via [typeahead][], and displays many common tags in a
 list on a sidebar.
 
 future
@@ -49,5 +50,7 @@ future
 
 - keep documentation (this doc) up to date (phil, ben)
 - silex documentation read (ben)
+- dump db table tags into json list e.g. ["namespace:tag",
+  "namespace:tag"] etc. at `/tags` (ben)
 - front end (ben)
 - hook them up (ben)
