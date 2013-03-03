@@ -46,7 +46,7 @@ $app->post('/login', function(Request $request) use ($app) {
   $password = $request->get('password');
   if ($username == 'test' && $password == 'password') {
     $app['session']->set('user', array('username' => $username));
-    return $app->redirect('/viztag');
+    return $app->redirect('/viztag/tag');
   } else {  # try again... TODO add error message
     return $app->redirect('/viztag/login');
   }
@@ -63,15 +63,11 @@ $app->get('/tag', function() use ($app) {
 
 # persist tagging / commenting for a status
 $app->get('/tags', function() use ($app, $dbh) {
-  $query="SELECT namespace, tag FROM tags";
+  $query='SELECT namespace, tag FROM tags';
   $sql=$dbh->prepare($query);
   $sql->execute();
-  $results = $sql->fetchAll();
-  $data = array();
-  foreach($results as $line){
-    $data[] = $line[0] . ": " . $line[1];
-  }
-  $data =  array_values($data);
+  $results = $sql->fetchAll(PDO::FETCH_ASSOC);
+  $data = array_map('detagify', $results);
   return $app->json($data, 200, array('Content-Type' => 'application/json'));
 });
 

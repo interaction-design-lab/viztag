@@ -32,6 +32,12 @@ function debug($thing, $description=null) {
     }
 }
 
+// given a dict keys 'namespace' and 'tag',
+// return a string <namespace>:<tag>
+function detagify($arr) {
+  return $arr['namespace'].':'.$arr['tag'];
+}
+
 function stripslashes_deep($val) {
   $val = is_array($val) ?
     array_map('stripslashes_deep', $val) :
