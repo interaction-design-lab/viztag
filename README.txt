@@ -2,7 +2,7 @@ viztag
 ======
 
 let multiple coders add tags and comments to the unit of analysis: a
-qualitative coding tool
+qualitative coding tool.
 
 install
 -------
@@ -25,6 +25,11 @@ tag autosuggest, ...
 [composer]: http://github.com/composer/composer
 [bootstrap]: http://twitter.github.com/bootstrap
 [typeahead]: http://twitter.github.com/bootstrap/javascript.html#typeahead
+
+configure
+---------
+
+coming soon...
 
 use
 ---

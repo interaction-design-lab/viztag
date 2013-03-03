@@ -9,7 +9,7 @@ define('DEBUG', 1);
 
 require_once __DIR__.'/vendor/autoload.php';  # silex
 require_once './util/functions.php';
-require_once './config.php';  # app config => $config
+require_once './config.php';  # app config loaded into $config
 $dbh = db_connect($config['db']);
 
 ###################
@@ -62,8 +62,16 @@ $app->get('/tag', function() use ($app) {
 });
 
 # persist tagging / commenting for a status
-$app->get('/tags', function() use ($app) {
-  $data = array("philadams", "shionguha", "bdalson");
+$app->get('/tags', function() use ($app, $dbh) {
+  $query="SELECT namespace, tag FROM tags";
+  $sql=$dbh->prepare($query);
+  $sql->execute();
+  $results = $sql->fetchAll();
+  $data = array();
+  foreach($results as $line){
+    $data[] = $line[0] . ": " . $line[1];
+  }
+  $data =  array_values($data);
   return $app->json($data, 200, array('Content-Type' => 'application/json'));
 });
 

@@ -1,5 +1,11 @@
+# app config
 config.php
-composer.lock
+constants.php
 
+# IDEs etc.
+*.komodoproject
+
+# app install files
+composer.lock
 vendor/*
 !vendor/README.md
