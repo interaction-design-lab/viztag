@@ -7,7 +7,9 @@ var lastTag = function(query) {
 
 jQuery.getJSON('./tags', function(data) {
 
-  $('input#viztag-tagging').typeahead({
+  var viztagInput = $('input#viztag-tagging');
+
+  viztagInput.typeahead({
     source: data,
     matcher: function(item) {
       tquery = lastTag(this.query);
@@ -17,6 +19,8 @@ jQuery.getJSON('./tags', function(data) {
       return this.$element.val().replace(/[^,]*$/,item+',');
     }
   });
+
+  viztagInput.focus();
 
 });
 
