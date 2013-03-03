@@ -46,18 +46,22 @@ $app->post('/login', function(Request $request) use ($app) {
   $password = $request->get('password');
   if ($username == 'test' && $password == 'password') {
     $app['session']->set('user', array('username' => $username));
-    return $app->redirect('/viztag/tag');
+    return $app->redirect('/viztag');
   } else {  # try again... TODO add error message
     return $app->redirect('/viztag/login');
   }
 });
 
 # load a randomly selected status and display tagging / commenting for it
-$app->get('/tag', function() use ($app) {
+$app->get('/tag', function() use ($app, $dbh, $config) {
   if (null == $user = $app['session']->get('user')) {
     return $app->redirect('/viztag/login');
   }
-  $data = array('key' => 'val');
+  $sql = 'select * from verastatuses order by rand() limit 1';  # TODO limit to images new to coder
+  $query = $dbh->prepare($sql);
+  $query->execute();
+  $data = array_pop($query->fetchAll(PDO::FETCH_ASSOC));
+  $data['src'] = $config['img_base_path'] . $data['image_path'];
   return $app['twig']->render('tag.twig', $data);
 });
 

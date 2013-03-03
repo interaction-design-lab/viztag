@@ -2,9 +2,11 @@
 
 {% block content %}
   <h1>tag</h1>
-  <form>
+  <img src="{{src}}" alt="" width="250" height="250" />
+  <form method="post" action="/viztag/tag">
     <fieldset>
       <legend>add tags</legend>
+      <input type="hidden" name="id" value="{{id}}" />
       <input class="input-xxlarge" type="text" id="viztag-tagging" placeholder="enter tags..." autocomplete="off">
     </fieldset>
   </form>
