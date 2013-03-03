@@ -34,8 +34,16 @@ function debug($thing, $description=null) {
 
 // given a dict keys 'namespace' and 'tag',
 // return a string <namespace>:<tag>
-function detagify($arr) {
+function tagify($arr) {
   return $arr['namespace'].':'.$arr['tag'];
+}
+
+// given a str <namespace>:<tag>,
+// return a dict with keys 'namespace' and 'tag'
+function detagify($str) {
+  list($namespace, $tag) = explode(':', $str);
+  return array('namespace' => $namespace,
+               'tag' => $tag);
 }
 
 function stripslashes_deep($val) {

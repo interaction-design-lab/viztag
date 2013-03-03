@@ -6,8 +6,8 @@
   <form method="post" action="/viztag/tag">
     <fieldset>
       <legend>add tags</legend>
-      <input type="hidden" name="id" value="{{id}}" />
-      <input class="input-xxlarge" type="text" id="viztag-tagging" placeholder="enter tags..." autocomplete="off">
+      <input type="hidden" name="vs_id" value="{{id}}" />
+      <input class="input-xxlarge" type="text" id="viztag-tagging" placeholder="enter tags..." autocomplete="off" name="tags">
     </fieldset>
   </form>
 {% endblock %}

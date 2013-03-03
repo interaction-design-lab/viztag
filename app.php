@@ -45,7 +45,7 @@ $app->post('/login', function(Request $request) use ($app) {
   $username = $request->get('username');
   $password = $request->get('password');
   if ($username == 'test' && $password == 'password') {
-    $app['session']->set('user', array('username' => $username));
+    $app['session']->set('user', array('id' => 2, 'username' => $username));
     return $app->redirect('/viztag');
   } else {  # try again... TODO add error message
     return $app->redirect('/viztag/login');
@@ -65,13 +65,47 @@ $app->get('/tag', function() use ($app, $dbh, $config) {
   return $app['twig']->render('tag.twig', $data);
 });
 
+# persist this coder's tags for the given verastatus
+$app->post('/tag', function (Request $request) use($app, $dbh) {
+  if (null == $user = $app['session']->get('user')) {
+    return $app->redirect('/viztag/login');
+  }
+  $vs_id = $request->get('vs_id');
+  $rawtags = rtrim(trim($request->get('tags')), ',');
+  $tags = array_map('detagify', explode(',', $rawtags));
+
+  $tag_lookup = $dbh->prepare('select * from tags where namespace=:namespace and tag=:tag');
+  $tag_insert = $dbh->prepare('insert into tags (namespace, tag) values (:namespace, :tag');
+  $tagging_insert = $dbh->prepare('insert into tags_verastatuses (tag_id, coder_id, verastatus_id) values (:tag_id, :coder_id, :vs_id)');
+
+  foreach ($tags as $tag) {
+
+    // get the tag_id, TODO inserting a new tag if needed
+    $tag_lookup->execute(array(':namespace' => $tag['namespace'],
+                               ':tag' => $tag['tag']));
+    $t = $tag_lookup->fetch(PDO::FETCH_ASSOC);
+    $tag['id'] = $t['id'];
+
+    // insert tagging into tags_verastatuses
+    $arr = array(':tag_id' => $tag['id'],
+                 ':coder_id' => $user['id'],
+                 ':vs_id' => $vs_id);
+    if (!$tagging_insert->execute($arr)) {
+      # TODO figure out best way to handle errors
+      //debug($tagging_insert->errorInfo());
+    }
+  }
+  # TODO also include a flash message
+  return $app->redirect('/viztag/tag');
+});
+
 # persist tagging / commenting for a status
 $app->get('/tags', function() use ($app, $dbh) {
   $query='SELECT namespace, tag FROM tags';
   $sql=$dbh->prepare($query);
   $sql->execute();
   $results = $sql->fetchAll(PDO::FETCH_ASSOC);
-  $data = array_map('detagify', $results);
+  $data = array_map('tagify', $results);
   return $app->json($data, 200, array('Content-Type' => 'application/json'));
 });
 
