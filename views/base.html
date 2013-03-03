@@ -32,6 +32,10 @@
 
     <div class="container">
 
+      {% block flash %}{% if flash is defined %}
+      <div class="alert alert-{{flash.type}}">{{flash.msg}}</div>
+      {% endif %}{% endblock flash %}
+
       {% block content %}{% endblock %}
 
       <div id="footer">

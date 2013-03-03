@@ -24,6 +24,19 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 ));
 $app['debug'] = true;
 
+# silex before filter
+$app->before(function() use ($app) {
+
+  // short-term flash message (e.g. for error/success msgs)
+  $flash = $app['session']->get('flash');
+  $app['session']->set('flash', null);
+  if (!empty($flash)) {
+    $flash['type'] = $flash[0];
+    $flash['msg'] = $flash[1];
+    $app['twig']->addGlobal('flash', $flash);
+  }
+});
+
 $app->get('/', function() use ($app) {
   $data = array('help_person' => 'phil');
   return $app['twig']->render('index.twig', $data);
@@ -95,7 +108,7 @@ $app->post('/tag', function (Request $request) use($app, $dbh) {
       //debug($tagging_insert->errorInfo());
     }
   }
-  # TODO also include a flash message
+  $app['session']->set('flash', array('success', 'taggings saved!'));
   return $app->redirect('/viztag/tag');
 });
 
