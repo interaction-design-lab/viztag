@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}login{% endblock %}
+
+{% block content %}
+  <h1>viztag login</h1>
+  <form method="post" action="./login">
+    <fieldset>
+      <legend>login</legend>
+      <label for="username">username</label>
+      <input id="username" type="text" name="username" />
+      <label for="password">password</label>
+      <input id="password" type="password" name="password" />
+      <button type="submit">Log in</button>
+    </fieldset>
+  </form>
+{% endblock %}

@@ -1,0 +1,6 @@
+config.php
+composer.lock
+constants.php
+
+vendor/*
+!vendor/README.md

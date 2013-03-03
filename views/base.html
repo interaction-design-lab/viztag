@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./css/typeahead.js-bootstrap.css" />
+    <link rel="stylesheet" href="./css/viztag.css" />
+    <title>viztag</title>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="/viztag">viztag</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <!--<li class="active"><a href="#">Home</a></li>-->
+              <li><a href="/viztag">Home</a></li>
+              <li><a href="/viztag/tag">Tag</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      {% block content %}{% endblock %}
+
+      <div id="footer">
+        {% block footer %}
+          &copy; 2013 <a href="http://idl.cornell.edu">IDL</a>
+        {% endblock %}
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/viztag.js"></script>
+
+  </body>
+
+</html>
