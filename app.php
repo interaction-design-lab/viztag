@@ -40,23 +40,20 @@ $app->before(function() use ($app) {
   }
 });
 
+# GET:root
 $app->get('/', function() use ($app) {
   $data = array('help_person' => 'phil');
   return $app['twig']->render('index.twig', $data);
 });
 
 # display the log in form
+# GET:login
 $app->get('/login', function() use ($app) {
   return $app['twig']->render('login.twig');
 });
 
-# log the user out
-$app->get('/logout', function() use ($app) {
-  $app['session']->set('user', null);
-  return $app->redirect('/viztag');
-});
-
 # log in a coder with username/password - for now, test/password
+# POST:login
 $app->post('/login', function(Request $request) use ($app, $dbh) {
   $username = $request->get('username');
   $password = sha1($request->get('password'));
@@ -74,47 +71,80 @@ $app->post('/login', function(Request $request) use ($app, $dbh) {
   }
 });
 
-# load a randomly selected status and display tagging / commenting for it
+# log the user out
+# GET:logout
+$app->get('/logout', function() use ($app) {
+  $app['session']->set('user', null);
+  return $app->redirect('/viztag');
+});
+
+# select a viable status at random, and redirect to /tag/{status_id}
+# GET:tag
 $app->get('/tag', function() use ($app, $dbh, $config) {
   if (null == $user = $app['session']->get('user')) {
+    $app['session']->set('flash', array('error', 'Please log in'));
     return $app->redirect('/viztag/login');
   }
-  $sql = 'select * from verastatuses order by rand() limit 1';  # TODO limit to images new to coder
+  # TODO limit to images new to coder
+  $sql = <<<SQL
+  select * from
+  verastatuses
+  order by rand() limit 1
+SQL;
   $query = $dbh->prepare($sql);
   $query->execute();
   $data = array_pop($query->fetchAll(PDO::FETCH_ASSOC));
-  $data['src'] = $config['img_base_path'] . $data['image_path'];
+  return $app->redirect('/viztag/tag/'.$data['id']);
+});
+
+# display tagging interface for status with id={id}
+# GET:tag/id
+$app->get('/tag/{id}', function($id) use($app, $dbh, $config) {
+
+  // get status info
+  $query = $dbh->prepare('select * from verastatuses where id=?');
+  if (!$query->execute(array($id))) {
+    print_r($query->errorInfo());
+    return 'Broken...';
+  }
+  if (null == $status = $query->fetch(PDO::FETCH_ASSOC)) {
+    $app['session']->set('flash', array('error', 'Invalid statusID. Please hit \'tag\' again...'));
+    return $app->redirect('/viztag');
+  }
+
+  # add src to status
+  $status['src'] = $config['img_base_path'] . $status['image_path'];
+
+  # get tags
+  $data = array('tags' => getTags($dbh),
+                'status' => $status);
   return $app['twig']->render('tag.twig', $data);
 });
 
 # persist this coder's tags for the given verastatus
+# POST:tag
 $app->post('/tag', function (Request $request) use($app, $dbh) {
   if (null == $user = $app['session']->get('user')) {
     $app['session']->set('flash', array('error', 'please log in!'));
     return $app->redirect('/viztag/login');
   }
-
   $vs_id = $request->get('vs_id');
-  $rawtags = rtrim(trim($request->get('tags')), ',');
-  $tags = array_map('detagify', explode(',', $rawtags));
+  $tags = array_flip(array_filter(array_flip($request->request->all()),
+                     'isTagParam'));
+  if (in_array(-1, array_values($tags))) {
+    $app['session']->set('flash', array('error', 'Please select a tag for each namespace...'));
+    return $app->redirect('/viztag/tag/' . $vs_id);
+  }
 
-  $tag_lookup = $dbh->prepare('select * from tags where namespace=:namespace and tag=:tag');
-  $tag_insert = $dbh->prepare('insert into tags (namespace, tag) values (:namespace, :tag');
-  $tagging_insert = $dbh->prepare('insert into tags_verastatuses (tag_id, coder_id, verastatus_id) values (:tag_id, :coder_id, :vs_id)');
+  $tag_insert = $dbh->prepare('insert into tags_verastatuses (tag_id, coder_id, verastatus_id) values (:tag_id, :coder_id, :vs_id)');
 
-  foreach ($tags as $tag) {
-
-    // get the tag_id, TODO inserting a new tag if needed
-    $tag_lookup->execute(array(':namespace' => $tag['namespace'],
-                               ':tag' => $tag['tag']));
-    $t = $tag_lookup->fetch(PDO::FETCH_ASSOC);
-    $tag['id'] = $t['id'];
+  foreach ($tags as $tag => $tag_id) {
 
     // insert tagging into tags_verastatuses
-    $arr = array(':tag_id' => $tag['id'],
+    $arr = array(':tag_id' => $tag_id,
                  ':coder_id' => $user['id'],
                  ':vs_id' => $vs_id);
-    if (!$tagging_insert->execute($arr)) {
+    if (!$tag_insert->execute($arr)) {
       # TODO figure out best way to handle errors
       //debug($tagging_insert->errorInfo());
     }
@@ -190,5 +220,20 @@ SQL;
                 'tags' => $tags);
   return $app['twig']->render('tagging.twig', $data);
 });
+
+function getTags($dbh) {
+  $sql = 'select * from tags';
+  $query = $dbh->prepare($sql);
+  $query->execute();
+  $tags = array();
+  foreach($query->fetchAll(PDO::FETCH_ASSOC) as $tag) {
+    $tags[$tag['namespace']][] = $tag;
+  }
+  return $tags;
+}
+
+function isTagParam($x) {
+  return substr($x, 0, 4) === 'tag-';
+}
 
 $app->run();

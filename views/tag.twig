@@ -2,12 +2,30 @@
 
 {% block content %}
   <h1>tag</h1>
-  <img src="{{src}}" alt="" width="250" height="250" />
-  <form method="post" action="/viztag/tag">
-    <fieldset>
-      <legend>add tags</legend>
-      <input type="hidden" name="vs_id" value="{{id}}" />
-      <input class="input-xxlarge" type="text" id="viztag-tagging" placeholder="enter tags..." autocomplete="off" name="tags">
-    </fieldset>
-  </form>
+  <div class="row">
+
+    <div class="span4">
+      <img src="{{status.src}}" alt="" width="250" height="250" />
+    </div>
+
+    <div class="span8">
+      <form method="post" action="/viztag/tag">
+        <fieldset>
+          <legend>add tags</legend>
+          <input type="hidden" name="vs_id" value="{{status.id}}" />
+          {% for ns, nstags in tags %}
+          <select class="tag" name="tag-{{ns}}">
+            <option value="-1">{{ns}} (pick one)</option>
+            {% for tag in nstags %}
+            <option value="{{tag.id}}">{{tag.tag}}</option>
+            {% endfor %}
+          </select>
+          {% endfor %}
+          <input class="input-xxlarge" type="text" id="viztag-tagging" placeholder="filter..." autocomplete="off" name="tags">
+          <br><button type="submit">Add tags</button>
+        </fieldset>
+      </form>
+    </div>
+
+  </div>
 {% endblock %}

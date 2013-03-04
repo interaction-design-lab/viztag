@@ -39,19 +39,25 @@ Coder work flow is as follows:
 1. coder logs in (`/login`)
 2. coder heads to `/tag` where they are presented with a random status
    image
-3. coder can apply multiple tags (see below for details), and add an
+3. coder applies multiple tags (see below for details), and add an
    optional comment
 4. on submit, tag(s) and comment are saved, and `/tag` is reloaded
 5. coder logs out (`/logout`)
 
-Tags are namespaced, in the form `<namespace>:<tag>`; in the future we
-may allow values as well a la `<namespace>:<predicate>=<value>`, but not
-now. The tagging interface should let coders type in tags, offer
-autocomplete via [typeahead][], and displays many common tags in a
-list on a sidebar.
+Tags are namespaced, in the form `<namespace>:<tag>`. The tagging interface
+requires coders to select one tag per namespace; we use a list of select
+elements. Note that if you pass a GET param `l33t=1` to `/tag`, you can also
+type these categories into a [typeahead][]-enabled text input box.
 
 future
 ------
+
+- add 1 pull-down per namespace (force response per namespace)
+- add null entry for each category
+- views for coder descrepancy
+- views for all images for tag set (1 or more tags)
+- views for all tags per image (done, /taggings)
+- rename verastatuses / vs_id to statuses, status_id
 
 - keep documentation (this doc) up to date (phil, ben)
 - silex documentation read (ben)
