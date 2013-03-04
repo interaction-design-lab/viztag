@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.6.10)
 # Database: viztag
-# Generation Time: 2013-02-26 13:24:16 +0000
+# Generation Time: 2013-03-04 15:53:45 +0000
 # ************************************************************
 
 
@@ -27,9 +27,10 @@ DROP TABLE IF EXISTS `coders`;
 
 CREATE TABLE `coders` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq-name` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -76,10 +77,13 @@ DROP TABLE IF EXISTS `tags_verastatuses`;
 
 CREATE TABLE `tags_verastatuses` (
   `tag_id` int(11) unsigned NOT NULL,
+  `coder_id` int(10) unsigned NOT NULL DEFAULT '0',
   `verastatus_id` int(11) unsigned NOT NULL,
-  PRIMARY KEY (`tag_id`,`verastatus_id`),
+  PRIMARY KEY (`tag_id`,`coder_id`,`verastatus_id`),
   KEY `to_verastats` (`verastatus_id`),
+  KEY `to_coders` (`coder_id`),
   CONSTRAINT `to_tags` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `to_coders` FOREIGN KEY (`coder_id`) REFERENCES `coders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `to_verastats` FOREIGN KEY (`verastatus_id`) REFERENCES `verastatuses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
