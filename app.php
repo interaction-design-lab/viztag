@@ -128,7 +128,7 @@ $app->get('/tags', function() use ($app, $dbh) {
   $sql = 'SELECT namespace, tag FROM tags';
   $query = $dbh->prepare($sql);
   $query->execute();
-  $results = $query->fetchAlk(PDO::FETCH_ASSOC);
+  $results = $query->fetchAll(PDO::FETCH_ASSOC);
   $data = array_map('tagify', $results);
   return $app->json($data, 200, array('Content-Type' => 'application/json'));
 });
