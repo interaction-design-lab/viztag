@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>tagging (id={{verastatus.verastatus_id}})</h1>
+  <img src="{{verastatus.src}}" alt="" width="250" height="250" />
+  <ul>
+  {% for tag in tags %}
+    <li>{{tag.namespace}}:{{tag.tag}}</li>
+  {% endfor %}
+  </ul>
+{% endblock %}

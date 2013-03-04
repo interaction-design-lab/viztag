@@ -90,8 +90,10 @@ $app->get('/tag', function() use ($app, $dbh, $config) {
 # persist this coder's tags for the given verastatus
 $app->post('/tag', function (Request $request) use($app, $dbh) {
   if (null == $user = $app['session']->get('user')) {
+    $app['session']->set('flash', array('error', 'please log in!'));
     return $app->redirect('/viztag/login');
   }
+
   $vs_id = $request->get('vs_id');
   $rawtags = rtrim(trim($request->get('tags')), ',');
   $tags = array_map('detagify', explode(',', $rawtags));
@@ -123,12 +125,70 @@ $app->post('/tag', function (Request $request) use($app, $dbh) {
 
 # persist tagging / commenting for a status
 $app->get('/tags', function() use ($app, $dbh) {
-  $query='SELECT namespace, tag FROM tags';
-  $sql=$dbh->prepare($query);
-  $sql->execute();
-  $results = $sql->fetchAll(PDO::FETCH_ASSOC);
+  $sql = 'SELECT namespace, tag FROM tags';
+  $query = $dbh->prepare($sql);
+  $query->execute();
+  $results = $query->fetchAlk(PDO::FETCH_ASSOC);
   $data = array_map('tagify', $results);
   return $app->json($data, 200, array('Content-Type' => 'application/json'));
+});
+
+# admin view for taggings
+$app->get('/taggings', function() use ($app, $dbh, $config) {
+  $user = $app['session']->get('user');
+  if (null == $user || $user['username'] != 'admin') {
+    $app['session']->set('flash', array('error', 'admin only!'));
+    return $app->redirect('/viztag');
+  }
+
+  $sql = <<<SQL
+select s.verastatus_id, v.image_path, count(s.tag_id) as num_tags
+from tags_verastatuses s, coders u, tags t, verastatuses v
+where
+	s.coder_id=u.id
+	and s.tag_id=t.id
+  and s.verastatus_id=v.id
+group by verastatus_id
+SQL;
+  $query = $dbh->prepare($sql);
+  $query->execute();
+  $ret = $query->fetchAll(PDO::FETCH_ASSOC);
+  $taggings = array();
+  foreach ($ret as $r) {
+    $r['src'] = $config['img_base_path'] . $r['image_path'];
+    $taggings[] = $r;
+  }
+  return $app['twig']->render('taggings.twig', array('taggings'=>$taggings));
+});
+
+# admin view for particular tagging
+$app->get('/taggings/{id}', function($id) use ($app, $dbh, $config) {
+  $user = $app['session']->get('user');
+  if (null == $user || $user['username'] != 'admin') {
+    $app['session']->set('flash', array('error', 'admin only!'));
+    return $app->redirect('/viztag');
+  }
+
+  $sql = <<<SQL
+select s.verastatus_id, s.tag_id, s.coder_id, v.image_path, t.namespace, t.tag
+from tags_verastatuses s, coders u, tags t, verastatuses v
+where
+	s.coder_id=u.id
+	and s.tag_id=t.id
+  and s.verastatus_id=v.id
+  and s.verastatus_id=?
+SQL;
+  $query = $dbh->prepare($sql);
+  $query->execute(array($id));
+  $ret = $query->fetchAll(PDO::FETCH_ASSOC);
+  $tags = array();
+  foreach ($ret as $r) {
+    $r['src'] = $config['img_base_path'] . $r['image_path'];
+    $tags[] = $r;
+  }
+  $data = array('verastatus' => $tags[0],
+                'tags' => $tags);
+  return $app['twig']->render('tagging.twig', $data);
 });
 
 $app->run();
