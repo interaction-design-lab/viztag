@@ -27,6 +27,9 @@ $app['debug'] = true;
 # silex before filter
 $app->before(function() use ($app) {
 
+  // push user to views
+  $app['twig']->addGlobal('user', $app['session']->get('user'));
+
   // short-term flash message (e.g. for error/success msgs)
   $flash = $app['session']->get('flash');
   $app['session']->set('flash', null);
@@ -54,13 +57,19 @@ $app->get('/logout', function() use ($app) {
 });
 
 # log in a coder with username/password - for now, test/password
-$app->post('/login', function(Request $request) use ($app) {
+$app->post('/login', function(Request $request) use ($app, $dbh) {
   $username = $request->get('username');
-  $password = $request->get('password');
-  if ($username == 'test' && $password == 'password') {
+  $password = sha1($request->get('password'));
+
+  $query = $dbh->prepare('select * from coders where username=? and password=?');
+  $query->execute(array($username, $password));
+  $user = $query->fetch(PDO::FETCH_ASSOC);
+  if ($user) {
     $app['session']->set('user', array('id' => 2, 'username' => $username));
+    $app['session']->set('flash', array('success', 'you are logged in'));
     return $app->redirect('/viztag');
-  } else {  # try again... TODO add error message
+  } else {
+    $app['session']->set('flash', array('error', 'username/password incorrect'));
     return $app->redirect('/viztag/login');
   }
 });

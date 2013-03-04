@@ -26,6 +26,16 @@
               <li><a href="/viztag/tag">Tag</a></li>
             </ul>
           </div><!--/.nav-collapse -->
+          <div class="pull-right">
+            <ul class="nav">
+              <!--<li class="active"><a href="#">Home</a></li>-->
+              {% if user %}
+              <li><a href="/viztag/logout">log out ({{user.username}})</a></li>
+              {% else %}
+              <li><a href="/viztag/login">log in</a></li>
+              {% endif %}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
