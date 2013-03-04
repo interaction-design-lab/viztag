@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.6.10)
 # Database: viztag
-# Generation Time: 2013-02-26 13:24:45 +0000
+# Generation Time: 2013-03-04 15:54:36 +0000
 # ************************************************************
 
 
@@ -26,7 +26,7 @@
 LOCK TABLES `coders` WRITE;
 /*!40000 ALTER TABLE `coders` DISABLE KEYS */;
 
-INSERT INTO `coders` (`id`, `name`, `password`)
+INSERT INTO `coders` (`id`, `username`, `password`)
 VALUES
 	(1,'admin','e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4'),
 	(2,'test','5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8');
@@ -60,6 +60,25 @@ UNLOCK TABLES;
 # Dump of table tags_verastatuses
 # ------------------------------------------------------------
 
+LOCK TABLES `tags_verastatuses` WRITE;
+/*!40000 ALTER TABLE `tags_verastatuses` DISABLE KEYS */;
+
+INSERT INTO `tags_verastatuses` (`tag_id`, `coder_id`, `verastatus_id`)
+VALUES
+	(2,2,2),
+	(1,2,5),
+	(1,2,6),
+	(5,2,6),
+	(6,2,6),
+	(1,2,8),
+	(5,2,8),
+	(5,2,10),
+	(1,2,11),
+	(5,2,11),
+	(5,2,12);
+
+/*!40000 ALTER TABLE `tags_verastatuses` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table verastatuses
