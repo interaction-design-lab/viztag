@@ -5,7 +5,7 @@
   <ul>
   {% for status in mismatches %}
   {% for m in status %}
-    <li><img src="{{m.src}}" alt="" width="160" height="160" />
+    <li><img src="{{m.src}}" alt="" width="100" height="100" />
     {{m.namespace_x}}:{{m.tag_x}} ({{m.username_x}}) vs
     {{m.namespace_y}}:{{m.tag_y}} ({{m.username_y}})</li>
   </ul>
