@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.6.10)
 # Database: viztag
-# Generation Time: 2013-03-04 15:54:36 +0000
+# Generation Time: 2013-03-07 13:08:18 +0000
 # ************************************************************
 
 
@@ -29,7 +29,9 @@ LOCK TABLES `coders` WRITE;
 INSERT INTO `coders` (`id`, `username`, `password`)
 VALUES
 	(1,'admin','e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4'),
-	(2,'test','5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8');
+	(2,'test','5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'),
+	(3,'phil','77ba9cd915c8e359d9733edcfe9c61e5aca92afb'),
+	(4,'jaime','77ba9cd915c8e359d9733edcfe9c61e5aca92afb');
 
 /*!40000 ALTER TABLE `coders` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -48,10 +50,33 @@ LOCK TABLES `tags` WRITE;
 
 INSERT INTO `tags` (`id`, `namespace`, `tag`)
 VALUES
-	(5,'composition','mugshot'),
-	(6,'composition','still-life'),
-	(1,'content','exercise'),
-	(2,'content','nutrition');
+	(10,'composition','motion-blur'),
+	(7,'composition','mugshot'),
+	(27,'composition','other'),
+	(12,'composition','picture-of-a-picture'),
+	(11,'composition','self-portrait'),
+	(8,'composition','still-life'),
+	(9,'composition','wide-angle'),
+	(2,'content','exercise'),
+	(1,'content','food'),
+	(4,'content','furniture'),
+	(26,'content','other'),
+	(3,'content','place'),
+	(6,'content','social-others'),
+	(5,'content','transportation'),
+	(24,'phase','after'),
+	(22,'phase','before'),
+	(23,'phase','during'),
+	(25,'phase','none'),
+	(15,'social','others-implied'),
+	(14,'social','others-present'),
+	(17,'social','pets-implied'),
+	(16,'social','pets-present'),
+	(13,'social','solitary'),
+	(19,'time','day'),
+	(18,'time','morning'),
+	(20,'time','night'),
+	(21,'time','not-specified');
 
 /*!40000 ALTER TABLE `tags` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -65,17 +90,11 @@ LOCK TABLES `tags_verastatuses` WRITE;
 
 INSERT INTO `tags_verastatuses` (`tag_id`, `coder_id`, `verastatus_id`)
 VALUES
-	(2,2,2),
-	(1,2,5),
-	(1,2,6),
-	(5,2,6),
-	(6,2,6),
-	(1,2,8),
-	(5,2,8),
-	(5,2,10),
-	(1,2,11),
-	(5,2,11),
-	(5,2,12);
+	(13,2,12),
+	(21,2,12),
+	(25,2,12),
+	(26,2,12),
+	(27,2,12);
 
 /*!40000 ALTER TABLE `tags_verastatuses` ENABLE KEYS */;
 UNLOCK TABLES;
