@@ -87,9 +87,12 @@ $app->get('/tag', function() use ($app, $dbh, $config) {
   }
   # TODO limit to images new to coder
   $sql = <<<SQL
-  select * from
-  verastatuses
-  order by rand() limit 1
+select * from verastatuses s
+where
+	dataset='VERAPLUS_BETATESTERS'
+	and s.id not in (select distinct verastatus_id from tags_verastatuses v where coder_id=3) 
+order by rand()
+limit 1
 SQL;
   $query = $dbh->prepare($sql);
   $query->execute();
