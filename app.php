@@ -89,7 +89,7 @@ $app->get('/tag', function() use ($app, $dbh, $config) {
   $sql = <<<SQL
 select * from verastatuses s
 where
-	dataset='VERAPLUS_BETATESTERS'
+	dataset='VERA-WELLNESS'
 	and s.id not in (select distinct verastatus_id from tags_verastatuses v where coder_id=3) 
 order by rand()
 limit 1
