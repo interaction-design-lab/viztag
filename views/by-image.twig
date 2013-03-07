@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>taggings</h1>
+  <ul class="taggings">
+  {% for tagging in taggings %}
+    <li>
+      <a href="/viztag/taggings/by-image/{{tagging.status_id}}">
+        <img src="{{tagging.src}}" alt="" />
+        <p>coded by {{tagging.num_coders}}</p>
+      </a>
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock %}

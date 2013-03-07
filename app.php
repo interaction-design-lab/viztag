@@ -62,7 +62,7 @@ $app->post('/login', function(Request $request) use ($app, $dbh) {
   $query->execute(array($username, $password));
   $user = $query->fetch(PDO::FETCH_ASSOC);
   if ($user) {
-    $app['session']->set('user', array('id' => 2, 'username' => $username));
+    $app['session']->set('user', $user);
     $app['session']->set('flash', array('success', 'you are logged in'));
     return $app->redirect('/viztag');
   } else {
@@ -164,7 +164,19 @@ $app->get('/tags', function() use ($app, $dbh) {
 });
 
 # admin view for taggings
+# GET:taggings
 $app->get('/taggings', function() use ($app, $dbh, $config) {
+  $user = $app['session']->get('user');
+  if (null == $user || $user['username'] != 'admin') {
+    $app['session']->set('flash', array('error', 'admin only!'));
+    return $app->redirect('/viztag');
+  }
+  return $app['twig']->render('taggings.twig');
+});
+
+# admin view for taggings
+# GET:taggings/by-image
+$app->get('/taggings/by-image', function() use ($app, $dbh, $config) {
   $user = $app['session']->get('user');
   if (null == $user || $user['username'] != 'admin') {
     $app['session']->set('flash', array('error', 'admin only!'));
@@ -172,12 +184,15 @@ $app->get('/taggings', function() use ($app, $dbh, $config) {
   }
 
   $sql = <<<SQL
-select s.verastatus_id, v.image_path, count(s.tag_id) as num_tags
+select verastatus_id as status_id, image_path, count(coder_id) as num_coders
+from
+(select s.verastatus_id, v.image_path, coder_id
 from tags_verastatuses s, coders u, tags t, verastatuses v
 where
 	s.coder_id=u.id
 	and s.tag_id=t.id
   and s.verastatus_id=v.id
+group by verastatus_id, coder_id) tmp
 group by verastatus_id
 SQL;
   $query = $dbh->prepare($sql);
@@ -188,11 +203,11 @@ SQL;
     $r['src'] = $config['img_base_path'] . $r['image_path'];
     $taggings[] = $r;
   }
-  return $app['twig']->render('taggings.twig', array('taggings'=>$taggings));
+  return $app['twig']->render('by-image.twig', array('taggings'=>$taggings));
 });
 
-# admin view for particular tagging
-$app->get('/taggings/{id}', function($id) use ($app, $dbh, $config) {
+# admin view for tag mismatches
+$app->get('/taggings/mismatch', function() use ($app, $dbh, $config) {
   $user = $app['session']->get('user');
   if (null == $user || $user['username'] != 'admin') {
     $app['session']->set('flash', array('error', 'admin only!'));
@@ -200,7 +215,41 @@ $app->get('/taggings/{id}', function($id) use ($app, $dbh, $config) {
   }
 
   $sql = <<<SQL
-select s.verastatus_id, s.tag_id, s.coder_id, v.image_path, t.namespace, t.tag
+select x.tag_id as tag_id_x, x.coder_id as coder_id_x, x.username as username_x, x.namespace as namespace_x, x.tag as tag_x,
+       y.tag_id as tag_id_y, y.coder_id as coder_id_y, y.username as username_y, y.namespace as namespace_y , y.tag as tag_y,
+       s.id as status_id, s.image_path
+#select *
+from
+(select v.tag_id, v.coder_id, v.verastatus_id, t.namespace, t.tag, c.username
+from tags_verastatuses v, tags t, coders c where v.tag_id=t.id and v.coder_id=c.id) x
+join (select v.tag_id, v.coder_id, v.verastatus_id, t.namespace, t.tag, c.username
+from tags_verastatuses v, tags t, coders c where v.tag_id=t.id and v.coder_id=c.id) y
+on (x.coder_id<y.coder_id and x.namespace=y.namespace and x.tag<>y.tag)
+join verastatuses s on (s.id=x.verastatus_id)
+order by status_id asc
+SQL;
+  $query = $dbh->prepare($sql);
+  $query->execute();
+  $ret = $query->fetchAll(PDO::FETCH_ASSOC);
+  $mm = array();
+  foreach ($ret as $r) {
+    $r['src'] = $config['img_base_path'] . $r['image_path'];
+    $mm[$r['status_id']][] = $r;
+  }
+  $data = array('mismatches' => $mm);
+  return $app['twig']->render('mismatch.twig', $data);
+});
+
+# admin view for particular tagging
+$app->get('/taggings/by-image/{id}', function($id) use ($app, $dbh, $config) {
+  $user = $app['session']->get('user');
+  if (null == $user || $user['username'] != 'admin') {
+    $app['session']->set('flash', array('error', 'admin only!'));
+    return $app->redirect('/viztag');
+  }
+
+  $sql = <<<SQL
+select s.verastatus_id, s.tag_id, s.coder_id, u.username, v.image_path, t.namespace, t.tag
 from tags_verastatuses s, coders u, tags t, verastatuses v
 where
 	s.coder_id=u.id
@@ -214,11 +263,11 @@ SQL;
   $tags = array();
   foreach ($ret as $r) {
     $r['src'] = $config['img_base_path'] . $r['image_path'];
-    $tags[] = $r;
+    $tags[$r['username']][] = $r;
   }
-  $data = array('verastatus' => $tags[0],
+  $data = array('status' => $r,
                 'tags' => $tags);
-  return $app['twig']->render('tagging.twig', $data);
+  return $app['twig']->render('by-image-single.twig', $data);
 });
 
 function getTags($dbh) {

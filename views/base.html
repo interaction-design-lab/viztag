@@ -31,7 +31,7 @@
             <ul class="nav">
               <!--<li class="active"><a href="#">Home</a></li>-->
               {% if user %}
-              <li><a href="/viztag/logout">log out ({{user.username}})</a></li>
+              <li><a href="/viztag/logout">log out ({{user.username}} - {{user.id}})</a></li>
               {% else %}
               <li><a href="/viztag/login">log in</a></li>
               {% endif %}

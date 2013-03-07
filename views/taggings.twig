@@ -1,15 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>taggings</h1>
-  <ul class="taggings">
-  {% for tagging in taggings %}
-    <li>
-      <a href="/viztag/taggings/{{tagging.verastatus_id}}">
-        <img src="{{tagging.src}}" alt="" />
-        <p><a href="/viztag/taggings/{{tagging.verastatus_id}}">tag count: {{tagging.num_tags}}</p>
-      </a>
-    </li>
-  {% endfor %}
+  <h1>Taggings...</h1>
+  <ul>
+    <li><a href="/viztag/taggings/by-image">...by image</a></li>
+    <li><a href="/viztag/taggings/mismatch">...mismatches</a></li>
   </ul>
 {% endblock %}

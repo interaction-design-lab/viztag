@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>tagging (id={{status.verastatus_id}})</h1>
+  <img src="{{status.src}}" alt="" width="250" height="250" />
+  {% for coder, ctags in tags %}
+  <p>coder {{coder}}</p>
+  <ul>
+    {% for tag in ctags %}
+    <li>{{tag.namespace}}:{{tag.tag}}</li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+{% endblock %}
