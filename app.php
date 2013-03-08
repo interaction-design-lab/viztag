@@ -273,6 +273,37 @@ SQL;
   return $app['twig']->render('by-image-single.twig', $data);
 });
 
+# admin view for sorting by tag
+$app->get('/taggings/by-tags/{tags}', function($tags) use ($app, $dbh, $config) {
+  $user = $app['session']->get('user');
+  if (null == $user || $user['username'] != 'admin') {
+    $app['session']->set('flash', array('error', 'admin only!'));
+    return $app->redirect('/viztag');
+  }
+  $data = array('tags' => getTags($dbh));
+  if($tags != ''){
+    $data['images'] = getImages($tags,$dbh,$config);
+  }
+  
+  return $app['twig']->render('by-tags.twig',$data);
+})->value('tags', '');
+
+# admin view for sorting by tag
+$app->post('/taggings/by-tags', function(Request $request) use ($app, $dbh, $config) {
+  $user = $app['session']->get('user');
+  if (null == $user || $user['username'] != 'admin') {
+    $app['session']->set('flash', array('error', 'admin only!'));
+    return $app->redirect('/viztag');
+  }
+  $tags = $request->get('tag');
+  if($tags == NULL){
+    $app['session']->set('flash', array('error', "Must select at least one tag"));
+    return $app->redirect('/viztag/taggings/by-tags');
+  }
+  return $app->redirect('/viztag/taggings/by-tags/'.implode("_",$tags));
+});
+
+
 function getTags($dbh) {
   $sql = 'select * from tags';
   $query = $dbh->prepare($sql);
@@ -282,6 +313,28 @@ function getTags($dbh) {
     $tags[$tag['namespace']][] = $tag;
   }
   return $tags;
+}
+
+function getImages($tags,$dbh,$config){
+  $tags = implode(" OR tag_id =", explode("_", $tags));
+  $sql = <<<SQL
+SELECT image_path, id, tag_id FROM tags_verastatuses v 
+JOIN verastatuses s on s.id=v.verastatus_id
+GROUP BY id
+HAVING tag_id = $tags
+ORDER BY RAND()
+SQL;
+  $query = $dbh->prepare($sql);
+  $query->execute();
+  $ret = $query->fetchAll(PDO::FETCH_ASSOC);
+  $pics = array();
+  foreach ($ret as $r) {
+    $r['src'] = $config['img_base_path'] . $r['image_path'];
+    $pics[] = $r;
+  }
+  
+  return $pics;
+  
 }
 
 function isTagParam($x) {

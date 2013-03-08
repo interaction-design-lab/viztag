@@ -25,3 +25,12 @@ ul.taggings li img {
   width: 180px;
   height: 180px;
 }
+
+.tagFilter{
+  float:left;
+  width:100%;
+  display:display:inline-block;
+  padding:1em;
+  border:1px solid #ccc;
+  margin-top:1em;
+}

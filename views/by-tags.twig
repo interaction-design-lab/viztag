@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}  
+<form name="tags" method="post" action="/viztag/taggings/by-tags">
+  {%if images is defined%}
+    <ul class="taggings">
+      {% for image in images %}
+        <li> 
+          <a href="/viztag/taggings/by-image/{{image.id}}">
+            <img src="{{image.src}}" alt="" />
+          </a>
+        </li>
+      {% endfor %}
+   </ul>
+  {% endif %}
+  <div class="tagFilter">
+      <p>
+        {% for ns, nstags in tags %}
+          {% for tag in nstags %}
+          <input type="checkbox" name='tag[]' value='{{tag.id}}'>&nbsp;{{ns}}:{{tag.tag}}<br />
+           {% endfor %}
+        {% endfor %}
+        <br /><button type="submit">Filter</button>
+      </p>
+  </div>
+</form>
+{% endblock %}
