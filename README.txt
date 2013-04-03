@@ -52,12 +52,11 @@ type these categories into a [typeahead][]-enabled text input box.
 future
 ------
 
-- add 1 pull-down per namespace (force response per namespace)
-- add null entry for each category
-- views for coder descrepancy
-- views for all images for tag set (1 or more tags)
-- views for all tags per image (done, /taggings)
-- rename verastatuses / vs_id to statuses, status_id
+- confirm working: views for all images for tag set (1 or more tags)
+- fix: admin view for coding mismatches
+- old vera images, grab the originals!!!
+- rename verastatuses / vs_id to statuses, status_i
+- when not all namespaces picked, redirect to same /{id} page
 
 - keep documentation (this doc) up to date (phil, ben)
 - silex documentation read (ben)
