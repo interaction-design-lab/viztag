@@ -1,3 +1,5 @@
+tmp/*
+
 # app config
 config.php
 constants.php
