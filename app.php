@@ -78,6 +78,10 @@ $app->get('/logout', function() use ($app) {
   return $app->redirect('/viztag');
 });
 
+#$app->get('/tag', function() {
+#  return 'ha';
+#});
+
 # select a viable status at random, and redirect to /tag/{status_id}
 # GET:tag
 $app->get('/tag', function() use ($app, $dbh, $config) {
@@ -85,15 +89,8 @@ $app->get('/tag', function() use ($app, $dbh, $config) {
     $app['session']->set('flash', array('error', 'Please log in'));
     return $app->redirect('/viztag/login');
   }
-  # TODO limit to images new to coder
-  $sql = <<<SQL
-select * from verastatuses s
-where
-	dataset='VERA-WELLNESS'
-	and s.id not in (select distinct verastatus_id from tags_verastatuses v where coder_id=3) 
-order by rand()
-limit 1
-SQL;
+  # limit to images new to coder
+  $sql = "select * from verastatuses s where dataset='vera-wellness-2011' and s.id not in (select distinct verastatus_id from tags_verastatuses v where coder_id=".$user['id'].") order by rand() limit 1";
   $query = $dbh->prepare($sql);
   $query->execute();
   $data = array_pop($query->fetchAll(PDO::FETCH_ASSOC));
@@ -116,7 +113,8 @@ $app->get('/tag/{id}', function($id) use($app, $dbh, $config) {
   }
 
   # add src to status
-  $status['src'] = $config['img_base_path'] . $status['image_path'];
+  #$status['src'] = $config['img_base_path'] . $status['image_path'];
+  $status['src'] = $status['image_path'];
 
   # get tags
   $data = array('tags' => getTags($dbh),
@@ -203,7 +201,8 @@ SQL;
   $ret = $query->fetchAll(PDO::FETCH_ASSOC);
   $taggings = array();
   foreach ($ret as $r) {
-    $r['src'] = $config['img_base_path'] . $r['image_path'];
+    #$r['src'] = $config['img_base_path'] . $r['image_path'];
+    $r['src'] = $r['image_path'];
     $taggings[] = $r;
   }
   return $app['twig']->render('by-image.twig', array('taggings'=>$taggings));
@@ -236,7 +235,8 @@ SQL;
   $ret = $query->fetchAll(PDO::FETCH_ASSOC);
   $mm = array();
   foreach ($ret as $r) {
-    $r['src'] = $config['img_base_path'] . $r['image_path'];
+    #$r['src'] = $config['img_base_path'] . $r['image_path'];
+    $r['src'] = $r['image_path'];
     $mm[$r['status_id']][] = $r;
   }
   $data = array('mismatches' => $mm);
@@ -265,7 +265,8 @@ SQL;
   $ret = $query->fetchAll(PDO::FETCH_ASSOC);
   $tags = array();
   foreach ($ret as $r) {
-    $r['src'] = $config['img_base_path'] . $r['image_path'];
+    #$r['src'] = $config['img_base_path'] . $r['image_path'];
+    $r['src'] = $r['image_path'];
     $tags[$r['username']][] = $r;
   }
   $data = array('status' => $r,
@@ -329,7 +330,8 @@ SQL;
   $ret = $query->fetchAll(PDO::FETCH_ASSOC);
   $pics = array();
   foreach ($ret as $r) {
-    $r['src'] = $config['img_base_path'] . $r['image_path'];
+    #$r['src'] = $config['img_base_path'] . $r['image_path'];
+    $r['src'] = $r['image_path'];
     $pics[] = $r;
   }
   
