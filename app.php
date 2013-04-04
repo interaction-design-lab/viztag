@@ -129,6 +129,7 @@ $app->post('/tag', function (Request $request) use($app, $dbh) {
     $app['session']->set('flash', array('error', 'please log in!'));
     return $app->redirect('/viztag/login');
   }
+
   $vs_id = $request->get('vs_id');
   $tags = array_flip(array_filter(array_flip($request->request->all()),
                      'isTagParam'));
@@ -136,6 +137,7 @@ $app->post('/tag', function (Request $request) use($app, $dbh) {
     $app['session']->set('flash', array('error', 'Please select a tag for each namespace...'));
     return $app->redirect('/viztag/tag/' . $vs_id);
   }
+
 
   $tag_insert = $dbh->prepare('insert into tags_verastatuses (tag_id, coder_id, verastatus_id) values (:tag_id, :coder_id, :vs_id)');
 
@@ -150,6 +152,16 @@ $app->post('/tag', function (Request $request) use($app, $dbh) {
       //debug($tagging_insert->errorInfo());
     }
   }
+
+  // insert comment (if any)
+  $comment = $request->get('comment');
+  if (!empty($comment)) {
+    $comment_insert = $dbh->prepare('insert into comments (verastatus_id, coder_id, comment) values (?, ?, ?)');
+    if (!$comment_insert->execute(array($vs_id, $user['id'], $comment))) {
+      //debug($comment_insert->errorInfo());
+    }
+  }
+
   $app['session']->set('flash', array('success', 'taggings saved!'));
   return $app->redirect('/viztag/tag');
 });
