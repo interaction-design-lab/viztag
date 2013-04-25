@@ -83,6 +83,26 @@ $app->get('/logout', function() use ($app) {
 #});
 
 # select a viable status at random, and redirect to /tag/{status_id}
+# GET:agreement
+$app->get('/agreement', function() use ($app, $dbh, $config) {
+  if (null == $user = $app['session']->get('user')) {
+    $app['session']->set('flash', array('error', 'Please log in'));
+    return $app->redirect('/viztag/login');
+  }
+  # limit to images new to coder, in the right sample AGREEMENT1
+  $sql = "select * from verastatuses s where dataset='vera-wellness-2011' and sample='AGREEMENT1' and s.id not in (select distinct verastatus_id from tags_verastatuses v where coder_id=".$user['id'].") order by rand() limit 1";
+  $query = $dbh->prepare($sql);
+  $query->execute();
+  $data = array_pop($query->fetchAll(PDO::FETCH_ASSOC));
+  if (empty($data)) {
+    return "agreement sample complete";
+  } else {
+    return $app->redirect('/viztag/tag/'.$data['id']);
+  }
+});
+
+# select a viable status at random, and redirect to /tag/{status_id}
+# for agreement sample with users 
 # GET:tag
 $app->get('/tag', function() use ($app, $dbh, $config) {
   if (null == $user = $app['session']->get('user')) {
@@ -124,7 +144,7 @@ $app->get('/tag/{id}', function($id) use($app, $dbh, $config) {
 
 # persist this coder's tags for the given verastatus
 # POST:tag
-$app->post('/tag', function (Request $request) use($app, $dbh) {
+$app->post('/tag', function(Request $request) use($app, $dbh) {
   if (null == $user = $app['session']->get('user')) {
     $app['session']->set('flash', array('error', 'please log in!'));
     return $app->redirect('/viztag/login');
@@ -163,7 +183,13 @@ $app->post('/tag', function (Request $request) use($app, $dbh) {
   }
 
   $app['session']->set('flash', array('success', 'taggings saved!'));
-  return $app->redirect('/viztag/tag');
+
+  // fix hack! by passing start page param along?
+  if ($user['id'] == 5 || $user['id'] == 6) {
+    return $app->redirect('/viztag/agreement');
+  } else {
+    return $app->redirect('/viztag/tag');
+  }
 });
 
 # persist tagging / commenting for a status
@@ -228,23 +254,25 @@ $app->get('/taggings/mismatch', function() use ($app, $dbh, $config) {
     return $app->redirect('/viztag');
   }
 
-  $sql = <<<SQL
-select x.tag_id as tag_id_x, x.coder_id as coder_id_x, x.username as username_x, x.namespace as namespace_x, x.tag as tag_x,
-       y.tag_id as tag_id_y, y.coder_id as coder_id_y, y.username as username_y, y.namespace as namespace_y , y.tag as tag_y,
-       s.id as status_id, s.image_path
-#select *
-from
-(select v.tag_id, v.coder_id, v.verastatus_id, t.namespace, t.tag, c.username
-from tags_verastatuses v, tags t, coders c where v.tag_id=t.id and v.coder_id=c.id) x
-join (select v.tag_id, v.coder_id, v.verastatus_id, t.namespace, t.tag, c.username
-from tags_verastatuses v, tags t, coders c where v.tag_id=t.id and v.coder_id=c.id) y
-on (x.coder_id<y.coder_id and x.namespace=y.namespace and x.tag<>y.tag)
-join verastatuses s on (s.id=x.verastatus_id)
-order by status_id asc
-SQL;
+  $tags = getTags($dbh);
+  $sql = 'select * from tags_verastatuses t, verastatuses v where t.verastatus_id=v.id and (t.coder_id=3 or t.coder_id=4)';
   $query = $dbh->prepare($sql);
   $query->execute();
   $ret = $query->fetchAll(PDO::FETCH_ASSOC);
+
+  // sort taggings by v.id
+  $taggings = array();
+  foreach ($ret as $r) {
+    $taggings[$r['verastatus_id']][] = $r;
+  }
+
+  // loop thru taggings, keeping those showing a mismatch
+  foreach ($taggings as $t) {
+    debug($t);
+    exit();
+  }
+
+
   $mm = array();
   foreach ($ret as $r) {
     #$r['src'] = $config['img_base_path'] . $r['image_path'];
@@ -329,7 +357,7 @@ function getTags($dbh) {
 }
 
 function getImages($tags,$dbh,$config){
-  $tags = implode(" OR tag_id =", explode("_", $tags));
+  $tags = implode(" OR tag_id=", explode("_", $tags));
   $sql = <<<SQL
 SELECT image_path, id, tag_id FROM tags_verastatuses v 
 JOIN verastatuses s on s.id=v.verastatus_id
@@ -337,6 +365,7 @@ GROUP BY id
 HAVING tag_id = $tags
 ORDER BY RAND()
 SQL;
+  debug($sql);
   $query = $dbh->prepare($sql);
   $query->execute();
   $ret = $query->fetchAll(PDO::FETCH_ASSOC);
